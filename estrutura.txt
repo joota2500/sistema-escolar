@@ -1,0 +1,251 @@
+.
+├── backend
+│   ├── dist
+│   │   ├── prisma.config.d.ts
+│   │   ├── prisma.config.js
+│   │   ├── prisma.config.js.map
+│   │   ├── src
+│   │   │   ├── app.controller.d.ts
+│   │   │   ├── app.controller.js
+│   │   │   ├── app.controller.js.map
+│   │   │   ├── app.module.d.ts
+│   │   │   ├── app.module.js
+│   │   │   ├── app.module.js.map
+│   │   │   ├── app.service.d.ts
+│   │   │   ├── app.service.js
+│   │   │   ├── app.service.js.map
+│   │   │   ├── constants
+│   │   │   │   ├── disciplinas.d.ts
+│   │   │   │   ├── disciplinas.js
+│   │   │   │   ├── disciplinas.js.map
+│   │   │   │   ├── estados.d.ts
+│   │   │   │   ├── estados.js
+│   │   │   │   └── estados.js.map
+│   │   │   ├── disciplina
+│   │   │   │   ├── disciplina.controller.d.ts
+│   │   │   │   ├── disciplina.controller.js
+│   │   │   │   ├── disciplina.controller.js.map
+│   │   │   │   ├── disciplina.module.d.ts
+│   │   │   │   ├── disciplina.module.js
+│   │   │   │   ├── disciplina.module.js.map
+│   │   │   │   ├── disciplina.service.d.ts
+│   │   │   │   ├── disciplina.service.js
+│   │   │   │   └── disciplina.service.js.map
+│   │   │   ├── dto
+│   │   │   │   ├── criar-escola.dto.d.ts
+│   │   │   │   ├── criar-escola.dto.js
+│   │   │   │   ├── criar-escola.dto.js.map
+│   │   │   │   ├── criar-professor.dto.d.ts
+│   │   │   │   ├── criar-professor.dto.js
+│   │   │   │   ├── criar-professor.dto.js.map
+│   │   │   │   ├── criar-turma.dto.d.ts
+│   │   │   │   ├── criar-turma.dto.js
+│   │   │   │   └── criar-turma.dto.js.map
+│   │   │   ├── escola
+│   │   │   │   ├── escola.controller.d.ts
+│   │   │   │   ├── escola.controller.js
+│   │   │   │   ├── escola.controller.js.map
+│   │   │   │   ├── escola.module.d.ts
+│   │   │   │   ├── escola.module.js
+│   │   │   │   ├── escola.module.js.map
+│   │   │   │   ├── escola.service.d.ts
+│   │   │   │   ├── escola.service.js
+│   │   │   │   └── escola.service.js.map
+│   │   │   ├── main.d.ts
+│   │   │   ├── main.js
+│   │   │   ├── main.js.map
+│   │   │   ├── prisma
+│   │   │   │   ├── prisma.service.d.ts
+│   │   │   │   ├── prisma.service.js
+│   │   │   │   └── prisma.service.js.map
+│   │   │   ├── professor
+│   │   │   │   ├── professor.controller.d.ts
+│   │   │   │   ├── professor.controller.js
+│   │   │   │   ├── professor.controller.js.map
+│   │   │   │   ├── professor.module.d.ts
+│   │   │   │   ├── professor.module.js
+│   │   │   │   ├── professor.module.js.map
+│   │   │   │   ├── professor.service.d.ts
+│   │   │   │   ├── professor.service.js
+│   │   │   │   └── professor.service.js.map
+│   │   │   ├── turma
+│   │   │   │   ├── turma.controller.d.ts
+│   │   │   │   ├── turma.controller.js
+│   │   │   │   ├── turma.controller.js.map
+│   │   │   │   ├── turma.module.d.ts
+│   │   │   │   ├── turma.module.js
+│   │   │   │   ├── turma.module.js.map
+│   │   │   │   ├── turma.service.d.ts
+│   │   │   │   ├── turma.service.js
+│   │   │   │   └── turma.service.js.map
+│   │   │   └── utils
+│   │   │       ├── cnpj.validator.d.ts
+│   │   │       ├── cnpj.validator.js
+│   │   │       ├── cnpj.validator.js.map
+│   │   │       ├── cpf.validator.d.ts
+│   │   │       ├── cpf.validator.js
+│   │   │       ├── cpf.validator.js.map
+│   │   │       ├── email.validator.d.ts
+│   │   │       ├── email.validator.js
+│   │   │       └── email.validator.js.map
+│   │   └── tsconfig.build.tsbuildinfo
+│   ├── eslint.config.mjs
+│   ├── nest-cli.json
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── prisma
+│   │   └── schema.prisma
+│   ├── prisma.config.ts
+│   ├── README.md
+│   ├── src
+│   │   ├── app.controller.spec.ts
+│   │   ├── app.controller.ts
+│   │   ├── app.module.ts
+│   │   ├── app.service.ts
+│   │   ├── constants
+│   │   │   ├── disciplinas.ts
+│   │   │   └── estados.ts
+│   │   ├── disciplina
+│   │   │   ├── disciplina.controller.ts
+│   │   │   ├── disciplina.module.ts
+│   │   │   └── disciplina.service.ts
+│   │   ├── dto
+│   │   │   ├── criar-escola.dto.ts
+│   │   │   ├── criar-professor.dto.ts
+│   │   │   └── criar-turma.dto.ts
+│   │   ├── escola
+│   │   │   ├── escola.controller.spec.ts
+│   │   │   ├── escola.controller.ts
+│   │   │   ├── escola.module.ts
+│   │   │   ├── escola.service.spec.ts
+│   │   │   └── escola.service.ts
+│   │   ├── estado
+│   │   │   ├── estado.controller.ts
+│   │   │   └── estado.module.ts
+│   │   ├── main.ts
+│   │   ├── prisma
+│   │   │   └── prisma.service.ts
+│   │   ├── professor
+│   │   │   ├── professor.controller.spec.ts
+│   │   │   ├── professor.controller.ts
+│   │   │   ├── professor.module.ts
+│   │   │   ├── professor.service.spec.ts
+│   │   │   └── professor.service.ts
+│   │   ├── turma
+│   │   │   ├── turma.controller.ts
+│   │   │   ├── turma.module.ts
+│   │   │   └── turma.service.ts
+│   │   └── utils
+│   │       ├── cnpj.validator.ts
+│   │       ├── cpf.validator.ts
+│   │       └── email.validator.ts
+│   ├── test
+│   │   ├── app.e2e-spec.ts
+│   │   └── jest-e2e.json
+│   ├── tsconfig.build.json
+│   └── tsconfig.json
+├── dev.sh
+├── estrutura.txt
+├── logs
+│   ├── backend.log
+│   └── flutter.log
+└── mobile
+    └── escola_app
+        ├── analysis_options.yaml
+        ├── escola_app.iml
+        ├── lib
+        │   ├── components
+        │   │   ├── search_bar.dart
+        │   │   ├── select_cidade.dart
+        │   │   ├── select_disciplina.dart
+        │   │   └── select_estado.dart
+        │   ├── main.dart
+        │   ├── models
+        │   │   ├── aluno.dart
+        │   │   ├── disciplina.dart
+        │   │   ├── escola.dart
+        │   │   ├── professor.dart
+        │   │   ├── turma.dart
+        │   │   └── usuario.dart
+        │   ├── pages
+        │   │   ├── admin
+        │   │   ├── home
+        │   │   └── login
+        │   └── services
+        │       ├── api_service.dart
+        │       ├── disciplina_service.dart
+        │       ├── escola_service.dart
+        │       ├── professor_service.dart
+        │       └── turma_service.dart
+        ├── linux
+        │   ├── CMakeLists.txt
+        │   ├── flutter
+        │   │   ├── CMakeLists.txt
+        │   │   ├── generated_plugin_registrant.cc
+        │   │   ├── generated_plugin_registrant.h
+        │   │   └── generated_plugins.cmake
+        │   └── runner
+        │       ├── CMakeLists.txt
+        │       ├── main.cc
+        │       ├── my_application.cc
+        │       └── my_application.h
+        ├── macos
+        │   ├── Flutter
+        │   │   ├── ephemeral
+        │   │   ├── Flutter-Debug.xcconfig
+        │   │   ├── Flutter-Release.xcconfig
+        │   │   └── GeneratedPluginRegistrant.swift
+        │   ├── Runner
+        │   │   ├── AppDelegate.swift
+        │   │   ├── Assets.xcassets
+        │   │   ├── Base.lproj
+        │   │   ├── Configs
+        │   │   ├── DebugProfile.entitlements
+        │   │   ├── Info.plist
+        │   │   ├── MainFlutterWindow.swift
+        │   │   └── Release.entitlements
+        │   ├── RunnerTests
+        │   │   └── RunnerTests.swift
+        │   ├── Runner.xcodeproj
+        │   │   ├── project.pbxproj
+        │   │   ├── project.xcworkspace
+        │   │   └── xcshareddata
+        │   └── Runner.xcworkspace
+        │       ├── contents.xcworkspacedata
+        │       └── xcshareddata
+        ├── pubspec.lock
+        ├── pubspec.yaml
+        ├── README.md
+        ├── test
+        │   └── widget_test.dart
+        ├── web
+        │   ├── favicon.png
+        │   ├── icons
+        │   │   ├── Icon-192.png
+        │   │   ├── Icon-512.png
+        │   │   ├── Icon-maskable-192.png
+        │   │   └── Icon-maskable-512.png
+        │   ├── index.html
+        │   └── manifest.json
+        └── windows
+            ├── CMakeLists.txt
+            ├── flutter
+            │   ├── CMakeLists.txt
+            │   ├── generated_plugin_registrant.cc
+            │   ├── generated_plugin_registrant.h
+            │   └── generated_plugins.cmake
+            └── runner
+                ├── CMakeLists.txt
+                ├── flutter_window.cpp
+                ├── flutter_window.h
+                ├── main.cpp
+                ├── resource.h
+                ├── resources
+                ├── runner.exe.manifest
+                ├── Runner.rc
+                ├── utils.cpp
+                ├── utils.h
+                ├── win32_window.cpp
+                └── win32_window.h
+
+58 directories, 191 files

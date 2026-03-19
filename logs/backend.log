@@ -1,0 +1,242 @@
+
+> escola-backend@0.0.1 start:dev
+> nest start --watch
+
+[2J[3J[H[[90m00:32:42[0m] Starting compilation in watch mode...
+
+[[90m00:32:47[0m] Found 0 errors. Watching for file changes.
+
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:47 [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:47 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +54ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:47 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mEstadoModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:47 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:47 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mDisciplinaModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:47 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAuthModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:47 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAlunoModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:47 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTurmaModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:47 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mEscolaModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:47 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAdminModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:47 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mProfessorModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAppController {/}:[39m[38;5;3m +4ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/, GET} route[39m[38;5;3m +2ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mEscolaController {/escola}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/escola, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/escola, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/escola/:id, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/escola/:id, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/escola/:id, DELETE} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/escola/:id/professores, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/escola/:id/status, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mProfessorController {/professor}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/professor/login, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/professor/alterar-senha, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/professor, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/professor, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/professor/:id, GET} route[39m[38;5;3m +3ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/professor/:id, PUT} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/professor/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mTurmaController {/turma}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/turma, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/turma, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/turma/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/turma/:id/professores, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/turma/:id, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/turma/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/turma/vincular-professor, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/turma/observacao, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/turma/horario, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mDisciplinaController {/disciplina}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/disciplina, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mEstadoController {/estado}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/estado, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAdminController {/admin}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/login, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/vincular, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/desvincular, DELETE} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAlunoController {/aluno}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/aluno, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/aluno, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/aluno/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/aluno/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 48727  - [39m19/03/2026, 00:32:48 [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +141ms[39m
+🚀 Servidor rodando na porta 3000
+prisma:error 
+Invalid `this.prisma.turma.create()` invocation in
+/home/joota2500/projetos/sistema-escolar/backend/src/turma/turma.service.ts:36:30
+
+  33   throw new BadRequestException('Turma já existe');
+  34 }
+  35 
+→ 36 return this.prisma.turma.create({
+       data: {
+         nome: "Turma B",
+         serie: 0,
+         sala: "01",
+         turno: "manha",
+         capacidade: 0,
+         ano_letivo: 2026,
+         escola_id: "f14250a8-b321-4ffa-8066-991aadec848e",
+     +   identificador: String
+       }
+     })
+
+Argument `identificador` is missing.
+[31m[Nest] 48727  - [39m19/03/2026, 00:40:53 [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPrismaClientValidationError: 
+Invalid `this.prisma.turma.create()` invocation in
+/home/joota2500/projetos/sistema-escolar/backend/src/turma/turma.service.ts:36:30
+
+  33   throw new BadRequestException('Turma já existe');
+  34 }
+  35 
+→ 36 return this.prisma.turma.create({
+       data: {
+         nome: "Turma B",
+         serie: 0,
+         sala: "01",
+         turno: "manha",
+         capacidade: 0,
+         ano_letivo: 2026,
+         escola_id: "f14250a8-b321-4ffa-8066-991aadec848e",
+     +   identificador: String
+       }
+     })
+
+Argument `identificador` is missing.
+    at throwValidationException [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/errorRendering/throwValidationException.ts:46:9[90m)[39m
+    at Gr.handleRequestError [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/RequestHandler.ts:211:7[90m)[39m
+    at Gr.handleAndLogRequestError [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/RequestHandler.ts:183:12[90m)[39m
+    at Gr.request [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/RequestHandler.ts:152:12[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+    at async a [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/getPrismaClient.ts:938:24[90m)[39m
+    at async [90m/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@nestjs/core[24m/router/router-execution-context.js:46:28
+    at async [90m/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@nestjs/core[24m/router/router-proxy.js:9:17 {
+  clientVersion: [32m'7.5.0'[39m
+}
+prisma:error 
+Invalid `this.prisma.turma.create()` invocation in
+/home/joota2500/projetos/sistema-escolar/backend/src/turma/turma.service.ts:36:30
+
+  33   throw new BadRequestException('Turma já existe');
+  34 }
+  35 
+→ 36 return this.prisma.turma.create({
+       data: {
+         nome: "Turma B",
+         serie: 0,
+         sala: "01",
+         turno: "manha",
+         capacidade: 0,
+         ano_letivo: 2026,
+         escola_id: "f14250a8-b321-4ffa-8066-991aadec848e",
+     +   identificador: String
+       }
+     })
+
+Argument `identificador` is missing.
+[31m[Nest] 48727  - [39m19/03/2026, 00:41:01 [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPrismaClientValidationError: 
+Invalid `this.prisma.turma.create()` invocation in
+/home/joota2500/projetos/sistema-escolar/backend/src/turma/turma.service.ts:36:30
+
+  33   throw new BadRequestException('Turma já existe');
+  34 }
+  35 
+→ 36 return this.prisma.turma.create({
+       data: {
+         nome: "Turma B",
+         serie: 0,
+         sala: "01",
+         turno: "manha",
+         capacidade: 0,
+         ano_letivo: 2026,
+         escola_id: "f14250a8-b321-4ffa-8066-991aadec848e",
+     +   identificador: String
+       }
+     })
+
+Argument `identificador` is missing.
+    at throwValidationException [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/errorRendering/throwValidationException.ts:46:9[90m)[39m
+    at Gr.handleRequestError [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/RequestHandler.ts:211:7[90m)[39m
+    at Gr.handleAndLogRequestError [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/RequestHandler.ts:183:12[90m)[39m
+    at Gr.request [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/RequestHandler.ts:152:12[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+    at async a [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/getPrismaClient.ts:938:24[90m)[39m
+    at async [90m/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@nestjs/core[24m/router/router-execution-context.js:46:28
+    at async [90m/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@nestjs/core[24m/router/router-proxy.js:9:17 {
+  clientVersion: [32m'7.5.0'[39m
+}
+[31m[Nest] 48727  - [39m19/03/2026, 00:41:58 [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPrismaClientValidationError: 
+Invalid `this.prisma.aluno.create()` invocation in
+/home/joota2500/projetos/sistema-escolar/backend/src/aluno/aluno.service.ts:21:36
+
+  18   emailResp?: string;
+  19   endereco?: string;
+  20 }) {
+→ 21   return await this.prisma.aluno.create({
+         data: {
+           nome: "aluno teste 01",
+           cpf: undefined,
+           dataNascimento: new Date("Invalid Date"),
+                           ~~~~~~~~~~~~~~~~~~~~~~~~
+           matricula: "11111111111",
+           turma_id: "24a51721-1c0e-487a-8207-747e9d6353c7",
+           nomePai: null,
+           nomeMae: null,
+           responsavel: null,
+           telefoneResp: null,
+           emailResp: null,
+           endereco: null
+         }
+       })
+
+Invalid value for argument `dataNascimento`: Provided Date object is invalid. Expected Date.
+    at throwValidationException [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/errorRendering/throwValidationException.ts:46:9[90m)[39m
+    at e.throwValidationError [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/jsonProtocol/serializeJsonQuery.ts:458:5[90m)[39m
+    at serializeArgumentsValue [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/jsonProtocol/serializeJsonQuery.ts:288:15[90m)[39m
+    at serializeArgumentsObject [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/jsonProtocol/serializeJsonQuery.ts:374:21[90m)[39m
+    at serializeArgumentsValue [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/jsonProtocol/serializeJsonQuery.ts:340:12[90m)[39m
+    at serializeArgumentsObject [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/jsonProtocol/serializeJsonQuery.ts:374:21[90m)[39m
+    at serializeFieldSelection [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/jsonProtocol/serializeJsonQuery.ts:127:16[90m)[39m
+    at serializeJsonQuery [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/jsonProtocol/serializeJsonQuery.ts:116:12[90m)[39m
+    at callback [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/getPrismaClient.ts:993:11[90m)[39m
+    at Object.runInChildSpan [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/tracing/TracingHelper.ts:28:12[90m)[39m {
+  clientVersion: [32m'7.5.0'[39m
+}
+[31m[Nest] 48727  - [39m19/03/2026, 00:46:53 [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPrismaClientValidationError: 
+Invalid `this.prisma.aluno.create()` invocation in
+/home/joota2500/projetos/sistema-escolar/backend/src/aluno/aluno.service.ts:21:36
+
+  18   emailResp?: string;
+  19   endereco?: string;
+  20 }) {
+→ 21   return await this.prisma.aluno.create({
+         data: {
+           nome: "aluno teste 02",
+           cpf: undefined,
+           dataNascimento: new Date("Invalid Date"),
+                           ~~~~~~~~~~~~~~~~~~~~~~~~
+           matricula: "MAT002",
+           turma_id: "24a51721-1c0e-487a-8207-747e9d6353c7",
+           nomePai: null,
+           nomeMae: null,
+           responsavel: null,
+           telefoneResp: null,
+           emailResp: null,
+           endereco: null
+         }
+       })
+
+Invalid value for argument `dataNascimento`: Provided Date object is invalid. Expected Date.
+    at throwValidationException [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/errorRendering/throwValidationException.ts:46:9[90m)[39m
+    at e.throwValidationError [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/jsonProtocol/serializeJsonQuery.ts:458:5[90m)[39m
+    at serializeArgumentsValue [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/jsonProtocol/serializeJsonQuery.ts:288:15[90m)[39m
+    at serializeArgumentsObject [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/jsonProtocol/serializeJsonQuery.ts:374:21[90m)[39m
+    at serializeArgumentsValue [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/jsonProtocol/serializeJsonQuery.ts:340:12[90m)[39m
+    at serializeArgumentsObject [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/jsonProtocol/serializeJsonQuery.ts:374:21[90m)[39m
+    at serializeFieldSelection [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/jsonProtocol/serializeJsonQuery.ts:127:16[90m)[39m
+    at serializeJsonQuery [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/jsonProtocol/serializeJsonQuery.ts:116:12[90m)[39m
+    at callback [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/getPrismaClient.ts:993:11[90m)[39m
+    at Object.runInChildSpan [90m(/home/joota2500/projetos/sistema-escolar/backend/[39mnode_modules/[4m@prisma/client[24m/src/runtime/core/tracing/TracingHelper.ts:28:12[90m)[39m {
+  clientVersion: [32m'7.5.0'[39m
+}

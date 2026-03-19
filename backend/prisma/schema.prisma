@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Escola {
+  id     String  @id @default(uuid())
+  nome   String
+  cnpj   String  @unique
+  cidade String
+  estado String
+  tipo   String
+  ativa  Boolean @default(true)
+
+  codigo_escola String? @unique
+
+  criado_em     DateTime @default(now())
+  atualizado_em DateTime @updatedAt
+
+  professores Professor[]
+  turmas      Turma[]
+  admins      AdminEscola[]
+}
+
+model Professor {
+  id         String  @id @default(uuid())
+  nome       String
+  cpf        String  @unique
+  email      String?
+  senha      String
+  disciplina String?
+  telefone   String?
+  status     String  @default("ativo")
+  escola_id  String
+
+  criado_em     DateTime @default(now())
+  atualizado_em DateTime @updatedAt
+
+  escola Escola @relation(fields: [escola_id], references: [id])
+
+  horarios          Horario[]
+  observacoes_turma ObservacaoTurma[]
+  professor_turma   ProfessorTurma[]
+}
+
+model Turma {
+  id            String  @id @default(uuid())
+  nome          String
+  serie         Int
+  identificador String
+  turno         String?
+  sala          String?
+  capacidade    Int?    @default(30)
+  escola_id     String
+  ano_letivo    Int
+
+  criado_em     DateTime @default(now())
+  atualizado_em DateTime @updatedAt
+
+  escola Escola @relation(fields: [escola_id], references: [id])
+
+  horarios          Horario[]
+  observacoes_turma ObservacaoTurma[]
+  professor_turma   ProfessorTurma[]
+  alunos            Aluno[]
+}
+
+model Aluno {
+  id String @id @default(uuid())
+
+  nome           String
+  cpf            String   @unique
+  dataNascimento DateTime
+  idade          Int?
+
+  matricula String @unique
+
+  nomePai      String?
+  nomeMae      String?
+  responsavel  String?
+  telefoneResp String?
+  emailResp    String?
+  endereco     String?
+
+  turma_id String
+  turma    Turma  @relation(fields: [turma_id], references: [id])
+
+  ativo Boolean @default(true)
+
+  criado_em     DateTime @default(now())
+  atualizado_em DateTime @updatedAt
+}
+
+model ProfessorTurma {
+  id           String @id @default(uuid())
+  professor_id String
+  turma_id     String
+  disciplina   String
+
+  criado_em DateTime @default(now())
+
+  professor Professor @relation(fields: [professor_id], references: [id])
+  turma     Turma     @relation(fields: [turma_id], references: [id])
+
+  @@unique([professor_id, turma_id])
+}
+
+model ObservacaoTurma {
+  id           String @id @default(uuid())
+  turma_id     String
+  professor_id String
+  observacao   String
+
+  criado_em DateTime @default(now())
+
+  professor Professor @relation(fields: [professor_id], references: [id])
+  turma     Turma     @relation(fields: [turma_id], references: [id])
+}
+
+model Horario {
+  id           String   @id @default(uuid())
+  turma_id     String
+  professor_id String
+  disciplina   String
+  dia_semana   String
+  hora_inicio  DateTime
+  hora_fim     DateTime
+
+  professor Professor @relation(fields: [professor_id], references: [id])
+  turma     Turma     @relation(fields: [turma_id], references: [id])
+}
+
+model Admin {
+  id    String @id @default(uuid())
+  nome  String
+  email String @unique
+  senha String
+
+  ativo Boolean @default(true)
+  role  String  @default("admin")
+
+  criado_em     DateTime @default(now())
+  atualizado_em DateTime @updatedAt
+
+  escolas AdminEscola[]
+}
+
+model AdminEscola {
+  id        String @id @default(uuid())
+  admin_id  String
+  escola_id String
+
+  criado_em DateTime @default(now())
+
+  admin  Admin  @relation(fields: [admin_id], references: [id])
+  escola Escola @relation(fields: [escola_id], references: [id])
+
+  @@unique([admin_id, escola_id])
+}
