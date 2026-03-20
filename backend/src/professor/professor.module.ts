@@ -8,10 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [
-    forwardRef(() => EscolaModule),
-    AuthModule, // 🔥 necessário pro JWT funcionar
-  ],
+  imports: [forwardRef(() => EscolaModule), AuthModule],
   controllers: [ProfessorController],
   providers: [ProfessorService, PrismaService],
   exports: [ProfessorService],

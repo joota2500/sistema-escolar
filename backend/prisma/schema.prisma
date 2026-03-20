@@ -4,133 +4,130 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Escola {
-  id     String  @id @default(uuid())
-  nome   String
-  cnpj   String  @unique
-  cidade String
-  estado String
-  tipo   String
-  ativa  Boolean @default(true)
+  id              String        @id @default(uuid())
+  nome            String
+  cnpj            String        @unique
+  cidade          String
+  estado          String
+  tipo            String
+  ativa           Boolean       @default(true)
+  motivo_bloqueio String?
+  bloqueada_em    DateTime?
+  modo_manutencao Boolean       @default(false)
+  codigo_escola   String?       @unique
+  criado_em       DateTime      @default(now())
+  atualizado_em   DateTime      @updatedAt
+  adminEscolas    AdminEscola[]
+  professores     Professor[]
+  turmas          Turma[]
+}
 
-  codigo_escola String? @unique
-
-  criado_em     DateTime @default(now())
-  atualizado_em DateTime @updatedAt
-
-  professores Professor[]
-  turmas      Turma[]
-  admins      AdminEscola[]
+model Sistema {
+  id                String   @id
+  manutencao_global Boolean  @default(false)
+  motivo            String?
+  atualizado_em     DateTime @updatedAt
 }
 
 model Professor {
-  id         String  @id @default(uuid())
-  nome       String
-  cpf        String  @unique
-  email      String?
-  senha      String
-  disciplina String?
-  telefone   String?
-  status     String  @default("ativo")
-  escola_id  String
-
-  criado_em     DateTime @default(now())
-  atualizado_em DateTime @updatedAt
-
-  escola Escola @relation(fields: [escola_id], references: [id])
-
+  id                String            @id @default(uuid())
+  nome              String
+  cpf               String            @unique
+  email             String?
+  senha             String
+  disciplina        String?
+  telefone          String?
+  status            String            @default("ativo")
+  escola_id         String
+  criado_em         DateTime          @default(now())
+  atualizado_em     DateTime          @updatedAt
   horarios          Horario[]
   observacoes_turma ObservacaoTurma[]
+  escola            Escola            @relation(fields: [escola_id], references: [id])
   professor_turma   ProfessorTurma[]
+
+  @@index([escola_id])
 }
 
 model Turma {
-  id            String  @id @default(uuid())
-  nome          String
-  serie         Int
-  identificador String
-  turno         String?
-  sala          String?
-  capacidade    Int?    @default(30)
-  escola_id     String
-  ano_letivo    Int
-
-  criado_em     DateTime @default(now())
-  atualizado_em DateTime @updatedAt
-
-  escola Escola @relation(fields: [escola_id], references: [id])
-
+  id                String            @id @default(uuid())
+  nome              String
+  serie             Int
+  identificador     String
+  turno             String?
+  sala              String?
+  capacidade        Int?              @default(30)
+  escola_id         String
+  ano_letivo        Int
+  criado_em         DateTime          @default(now())
+  atualizado_em     DateTime          @updatedAt
+  alunos            Aluno[]
   horarios          Horario[]
   observacoes_turma ObservacaoTurma[]
   professor_turma   ProfessorTurma[]
-  alunos            Aluno[]
+  escola            Escola            @relation(fields: [escola_id], references: [id])
+
+  @@index([escola_id])
 }
 
 model Aluno {
-  id String @id @default(uuid())
-
+  id             String   @id @default(uuid())
   nome           String
   cpf            String   @unique
   dataNascimento DateTime
   idade          Int?
+  matricula      String   @unique
+  nomePai        String?
+  nomeMae        String?
+  responsavel    String?
+  telefoneResp   String?
+  emailResp      String?
+  endereco       String?
+  turma_id       String
+  ativo          Boolean  @default(true)
+  criado_em      DateTime @default(now())
+  atualizado_em  DateTime @updatedAt
+  turma          Turma    @relation(fields: [turma_id], references: [id])
 
-  matricula String @unique
-
-  nomePai      String?
-  nomeMae      String?
-  responsavel  String?
-  telefoneResp String?
-  emailResp    String?
-  endereco     String?
-
-  turma_id String
-  turma    Turma  @relation(fields: [turma_id], references: [id])
-
-  ativo Boolean @default(true)
-
-  criado_em     DateTime @default(now())
-  atualizado_em DateTime @updatedAt
+  @@index([turma_id])
 }
 
 model ProfessorTurma {
-  id           String @id @default(uuid())
+  id           String    @id @default(uuid())
   professor_id String
   turma_id     String
   disciplina   String
-
-  criado_em DateTime @default(now())
-
-  professor Professor @relation(fields: [professor_id], references: [id])
-  turma     Turma     @relation(fields: [turma_id], references: [id])
+  criado_em    DateTime  @default(now())
+  professor    Professor @relation(fields: [professor_id], references: [id])
+  turma        Turma     @relation(fields: [turma_id], references: [id])
 
   @@unique([professor_id, turma_id])
 }
 
 model ObservacaoTurma {
-  id           String @id @default(uuid())
+  id           String    @id @default(uuid())
   turma_id     String
   professor_id String
   observacao   String
-
-  criado_em DateTime @default(now())
-
-  professor Professor @relation(fields: [professor_id], references: [id])
-  turma     Turma     @relation(fields: [turma_id], references: [id])
+  criado_em    DateTime  @default(now())
+  professor    Professor @relation(fields: [professor_id], references: [id])
+  turma        Turma     @relation(fields: [turma_id], references: [id])
 }
 
 model Horario {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   turma_id     String
   professor_id String
   disciplina   String
   dia_semana   String
   hora_inicio  DateTime
   hora_fim     DateTime
-
-  professor Professor @relation(fields: [professor_id], references: [id])
-  turma     Turma     @relation(fields: [turma_id], references: [id])
+  professor    Professor @relation(fields: [professor_id], references: [id])
+  turma        Turma     @relation(fields: [turma_id], references: [id])
 }
 
 model Admin {
@@ -142,6 +139,8 @@ model Admin {
   ativo Boolean @default(true)
   role  String  @default("admin")
 
+  primeiro_acesso Boolean @default(true)
+
   criado_em     DateTime @default(now())
   atualizado_em DateTime @updatedAt
 
@@ -149,14 +148,13 @@ model Admin {
 }
 
 model AdminEscola {
-  id        String @id @default(uuid())
+  id        String   @id @default(uuid())
   admin_id  String
   escola_id String
-
   criado_em DateTime @default(now())
-
-  admin  Admin  @relation(fields: [admin_id], references: [id])
-  escola Escola @relation(fields: [escola_id], references: [id])
+  admin     Admin    @relation(fields: [admin_id], references: [id])
+  escola    Escola   @relation(fields: [escola_id], references: [id])
 
   @@unique([admin_id, escola_id])
+  @@index([escola_id])
 }

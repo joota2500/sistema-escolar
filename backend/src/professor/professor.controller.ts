@@ -8,21 +8,15 @@ import {
   Param,
   ParseUUIDPipe,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 
 import { ProfessorService } from './professor.service';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CriarProfessorDTO } from '../dto/criar-professor.dto';
+import { RequestComUsuario } from '../common/interfaces/request.interface';
 
-interface ProfessorDTO {
-  nome: string;
-  cpf: string;
-  senha: string;
-  escola_id: string;
-  email?: string;
-  disciplina?: string;
-  telefone?: string;
-}
-
+@UseGuards(JwtAuthGuard)
 @Controller('professor')
 export class ProfessorController {
   constructor(private readonly professorService: ProfessorService) {}
@@ -32,44 +26,48 @@ export class ProfessorController {
     return this.professorService.login(dados);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @Post()
+  async cadastrar(
+    @Body() dados: CriarProfessorDTO,
+    @Req() req: RequestComUsuario,
+  ) {
+    return this.professorService.cadastrarProfessor(dados, req.user);
+  }
+
+  @Get()
+  async listar(@Req() req: RequestComUsuario) {
+    return this.professorService.listarProfessores(req.user);
+  }
+
+  @Get(':id')
+  async buscar(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestComUsuario,
+  ) {
+    return this.professorService.buscarProfessor(id, req.user);
+  }
+
+  @Put(':id')
+  async atualizar(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dados: Partial<CriarProfessorDTO>,
+    @Req() req: RequestComUsuario,
+  ) {
+    return this.professorService.atualizarProfessor(id, dados, req.user);
+  }
+
+  @Delete(':id')
+  async deletar(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestComUsuario,
+  ) {
+    return this.professorService.deletarProfessor(id, req.user);
+  }
+
   @Post('alterar-senha')
   async alterarSenha(
     @Body() dados: { cpf: string; senhaAtual: string; novaSenha: string },
   ) {
     return this.professorService.alterarSenha(dados);
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Post()
-  async cadastrarProfessor(@Body() dados: ProfessorDTO) {
-    return this.professorService.cadastrarProfessor(dados);
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Get()
-  async listarProfessores() {
-    return this.professorService.listarProfessores();
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Get(':id')
-  async buscarProfessor(@Param('id', ParseUUIDPipe) id: string) {
-    return this.professorService.buscarProfessor(id);
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Put(':id')
-  async atualizarProfessor(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() dados: Partial<ProfessorDTO>,
-  ) {
-    return this.professorService.atualizarProfessor(id, dados);
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Delete(':id')
-  async deletarProfessor(@Param('id', ParseUUIDPipe) id: string) {
-    return this.professorService.deletarProfessor(id);
   }
 }

@@ -1,31 +1,60 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
-import { AlunoService } from './aluno.service';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 
+import { AlunoService } from './aluno.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CreateAlunoDTO } from '../dto/criar-aluno.dto';
+import { RequestComUsuario } from '../common/interfaces/request.interface';
+
+@UseGuards(JwtAuthGuard)
 @Controller('aluno')
 export class AlunoController {
   constructor(private readonly service: AlunoService) {}
 
-  // 🔥 CRIAR
+  // ==========================
+  // CRIAR
+  // ==========================
   @Post()
-  async criar(@Body() body: any) {
-    return await this.service.criar(body);
+  async criar(@Body() body: CreateAlunoDTO, @Req() req: RequestComUsuario) {
+    return this.service.criar(body, req.user);
   }
 
-  // 🔥 LISTAR
+  // ==========================
+  // LISTAR
+  // ==========================
   @Get()
-  async listar() {
-    return await this.service.listar();
+  async listar(@Req() req: RequestComUsuario) {
+    return this.service.listar(req.user);
   }
 
-  // 🔥 BUSCAR
+  // ==========================
+  // BUSCAR
+  // ==========================
   @Get(':id')
-  async buscar(@Param('id') id: string) {
-    return await this.service.buscar(id);
+  async buscar(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestComUsuario,
+  ) {
+    return this.service.buscar(id, req.user);
   }
 
-  // 🔥 DELETAR
+  // ==========================
+  // DELETAR
+  // ==========================
   @Delete(':id')
-  async deletar(@Param('id') id: string) {
-    return await this.service.deletar(id);
+  async deletar(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestComUsuario,
+  ) {
+    return this.service.deletar(id, req.user);
   }
 }

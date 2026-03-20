@@ -2,111 +2,35 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { CriarEscolaDTO } from '../dto/criar-escola.dto';
+import * as bcrypt from 'bcrypt';
+import { UsuarioLogado } from '../common/interfaces/usuario-logado.interface';
 
 @Injectable()
 export class EscolaService {
   constructor(private prisma: PrismaService) {}
 
-  private gerarCodigoEscola(): string {
-    const numero = Math.floor(1000 + Math.random() * 9000);
-    return `ESC-${numero}`;
-  }
-
-  private validarCNPJ(cnpj: string): boolean {
-    return /^[0-9]{14}$/.test(cnpj);
-  }
-
-  private validarEmail(email: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  }
-
   // =============================
-  // CRIAR
+  // 🔐 VALIDA ACESSO
   // =============================
-  async criarEscola(dados: CriarEscolaDTO) {
-    const { nome, cnpj, cidade, estado, tipo } = dados;
+  private validarAcesso(user: UsuarioLogado, escola_id: string) {
+    if (user.role === 'superadmin') return;
 
-    if (!nome || !cnpj || !cidade || !estado || !tipo) {
-      throw new BadRequestException('Dados obrigatórios faltando');
+    if (!user.escola_id || user.escola_id !== escola_id) {
+      throw new ForbiddenException('Acesso negado');
     }
-
-    if (!this.validarCNPJ(cnpj)) {
-      throw new BadRequestException('CNPJ inválido');
-    }
-
-    if (dados.email && !this.validarEmail(dados.email)) {
-      throw new BadRequestException('Email inválido');
-    }
-
-    const existente = await this.prisma.escola.findUnique({
-      where: { cnpj },
-    });
-
-    if (existente) {
-      throw new BadRequestException('CNPJ já cadastrado');
-    }
-
-    // 🔥 gerar código único
-    let codigo = this.gerarCodigoEscola();
-
-    while (
-      await this.prisma.escola.findFirst({
-        where: { codigo_escola: codigo },
-      })
-    ) {
-      codigo = this.gerarCodigoEscola();
-    }
-
-    const escola = await this.prisma.escola.create({
-      data: {
-        nome,
-        cnpj,
-        cidade,
-        estado,
-        tipo,
-        ativa: true,
-        codigo_escola: codigo,
-      },
-    });
-
-    // 🔥 NOVO: ALERTA SE NÃO TIVER ADMIN
-    const totalAdmins = await this.prisma.adminEscola.count({
-      where: { escola_id: escola.id },
-    });
-
-    return {
-      sucesso: true,
-      escola,
-      alerta:
-        totalAdmins === 0
-          ? '⚠️ Escola criada, mas precisa de um administrador para funcionar'
-          : null,
-    };
   }
 
   // =============================
-  // LISTAR
+  // 🔍 GARANTE EXISTÊNCIA
   // =============================
-  listarEscolas() {
-    return this.prisma.escola.findMany({
-      orderBy: { nome: 'asc' },
-    });
-  }
-
-  // =============================
-  // BUSCAR
-  // =============================
-  async buscarEscola(id: string) {
+  private async validarExistencia(id: string) {
     const escola = await this.prisma.escola.findUnique({
       where: { id },
-      include: {
-        professores: true,
-        turmas: true,
-      },
     });
 
     if (!escola) {
@@ -117,88 +41,168 @@ export class EscolaService {
   }
 
   // =============================
-  // STATUS (🔥 NOVO)
+  // 🔢 GERAR CÓDIGO
   // =============================
-  async statusEscola(id: string) {
-    const escola = await this.prisma.escola.findUnique({
-      where: { id },
+  private gerarCodigoEscola(): string {
+    return `ESC-${Math.floor(1000 + Math.random() * 9000)}`;
+  }
+
+  // =============================
+  // 🔥 CRIAR ESCOLA + DIRETOR
+  // =============================
+  async criarEscola(dados: CriarEscolaDTO, user: UsuarioLogado) {
+    console.log('USER CREATE ESCOLA:', user); // 🔥 debug
+
+    if (!user || user.role !== 'superadmin') {
+      throw new ForbiddenException('Somente superadmin pode criar escola');
+    }
+
+    if (!dados.nome || !dados.cnpj || !dados.admin_nome || !dados.admin_email) {
+      throw new BadRequestException('Dados obrigatórios faltando');
+    }
+
+    const existente = await this.prisma.escola.findUnique({
+      where: { cnpj: dados.cnpj },
     });
 
-    if (!escola) {
-      throw new NotFoundException('Escola não encontrada');
+    if (existente) {
+      throw new BadRequestException('CNPJ já cadastrado');
     }
+
+    // 🔥 senha automática
+    const senhaPadrao = `ESC${Math.floor(1000 + Math.random() * 9000)}`;
+    const senhaHash = await bcrypt.hash(senhaPadrao, 10);
+
+    return this.prisma.$transaction(async (tx) => {
+      const escola = await tx.escola.create({
+        data: {
+          nome: dados.nome,
+          cnpj: dados.cnpj,
+          cidade: dados.cidade,
+          estado: dados.estado,
+          tipo: dados.tipo,
+          ativa: true,
+          codigo_escola: this.gerarCodigoEscola(),
+        },
+      });
+
+      const admin = await tx.admin.create({
+        data: {
+          nome: dados.admin_nome,
+          email: dados.admin_email,
+          senha: senhaHash,
+          role: 'admin',
+          primeiro_acesso: true,
+        },
+      });
+
+      await tx.adminEscola.create({
+        data: {
+          admin_id: admin.id,
+          escola_id: escola.id,
+        },
+      });
+
+      return {
+        sucesso: true,
+        escola,
+        admin: {
+          email: admin.email,
+          senha_inicial: senhaPadrao,
+        },
+      };
+    });
+  }
+
+  // =============================
+  // 📋 LISTAR
+  // =============================
+  async listarEscolas(user: UsuarioLogado) {
+    if (user.role === 'superadmin') {
+      return this.prisma.escola.findMany({
+        orderBy: { nome: 'asc' },
+      });
+    }
+
+    return this.prisma.escola.findMany({
+      where: {
+        adminEscolas: {
+          some: {
+            admin_id: user.id, // ✅ CORRETO
+          },
+        },
+      },
+    });
+  }
+
+  // =============================
+  // 🔍 BUSCAR
+  // =============================
+  async buscarEscola(id: string, user: UsuarioLogado) {
+    const escola = await this.validarExistencia(id);
+    this.validarAcesso(user, id);
+    return escola;
+  }
+
+  // =============================
+  // 📊 STATUS
+  // =============================
+  async statusEscola(id: string, user: UsuarioLogado) {
+    this.validarAcesso(user, id);
+
+    const escola = await this.validarExistencia(id);
 
     const totalAdmins = await this.prisma.adminEscola.count({
       where: { escola_id: id },
     });
 
     return {
-      escola,
-      status:
-        totalAdmins === 0 ? '⚠️ Escola sem administrador' : '✅ Escola ativa',
+      ativa: escola.ativa,
+      manutencao: escola.modo_manutencao,
+      motivo: escola.motivo_bloqueio,
+      bloqueada_em: escola.bloqueada_em,
+      totalAdmins,
+      status: !escola.ativa
+        ? '🔒 Bloqueada'
+        : escola.modo_manutencao
+          ? '🛠 Em manutenção'
+          : totalAdmins === 0
+            ? '⚠️ Sem administrador'
+            : '✅ Ativa',
     };
   }
 
   // =============================
-  // ATUALIZAR
+  // ✏️ ATUALIZAR
   // =============================
-  async atualizarEscola(id: string, dados: Partial<CriarEscolaDTO>) {
-    const escola = await this.prisma.escola.findUnique({
-      where: { id },
-    });
-
-    if (!escola) {
-      throw new NotFoundException('Escola não encontrada');
-    }
-
-    if (dados.cnpj && !this.validarCNPJ(dados.cnpj)) {
-      throw new BadRequestException('CNPJ inválido');
-    }
-
-    if (dados.cnpj && dados.cnpj !== escola.cnpj) {
-      const existe = await this.prisma.escola.findUnique({
-        where: { cnpj: dados.cnpj },
-      });
-
-      if (existe) {
-        throw new BadRequestException('CNPJ já cadastrado');
-      }
-    }
+  async atualizarEscola(
+    id: string,
+    dados: Partial<CriarEscolaDTO>,
+    user: UsuarioLogado,
+  ) {
+    this.validarAcesso(user, id);
+    await this.validarExistencia(id);
 
     return this.prisma.escola.update({
       where: { id },
       data: {
-        nome: dados.nome ?? escola.nome,
-        cnpj: dados.cnpj ?? escola.cnpj,
-        cidade: dados.cidade ?? escola.cidade,
-        estado: dados.estado ?? escola.estado,
-        tipo: dados.tipo ?? escola.tipo,
-        atualizado_em: new Date(),
+        ...(dados.nome && { nome: dados.nome }),
+        ...(dados.cidade && { cidade: dados.cidade }),
+        ...(dados.estado && { estado: dados.estado }),
+        ...(dados.tipo && { tipo: dados.tipo }),
       },
     });
   }
 
   // =============================
-  // DELETAR
+  // ❌ DELETAR
   // =============================
-  async deletarEscola(id: string) {
-    await this.buscarEscola(id);
-
-    const professores = await this.prisma.professor.count({
-      where: { escola_id: id },
-    });
-
-    if (professores > 0) {
-      throw new BadRequestException('Existe professor vinculado');
+  async deletarEscola(id: string, user: UsuarioLogado) {
+    if (user.role !== 'superadmin') {
+      throw new ForbiddenException('Somente superadmin');
     }
 
-    const turmas = await this.prisma.turma.count({
-      where: { escola_id: id },
-    });
-
-    if (turmas > 0) {
-      throw new BadRequestException('Existe turma vinculada');
-    }
+    await this.validarExistencia(id);
 
     await this.prisma.escola.delete({
       where: { id },
@@ -208,12 +212,69 @@ export class EscolaService {
   }
 
   // =============================
-  // PROFESSORES
+  // 👨‍🏫 PROFESSORES
   // =============================
-  listarProfessoresDaEscola(id: string) {
+  async listarProfessoresDaEscola(id: string, user: UsuarioLogado) {
+    this.validarAcesso(user, id);
+
     return this.prisma.professor.findMany({
       where: { escola_id: id },
-      orderBy: { nome: 'asc' },
+    });
+  }
+
+  // =============================
+  // 🔓 ATIVAR
+  // =============================
+  async ativarEscola(id: string, user: UsuarioLogado) {
+    if (user.role !== 'superadmin') throw new ForbiddenException();
+
+    await this.validarExistencia(id);
+
+    return this.prisma.escola.update({
+      where: { id },
+      data: {
+        ativa: true,
+        motivo_bloqueio: null,
+        bloqueada_em: null,
+      },
+    });
+  }
+
+  // =============================
+  // 🔒 DESATIVAR
+  // =============================
+  async desativarEscola(id: string, motivo: string, user: UsuarioLogado) {
+    if (user.role !== 'superadmin') throw new ForbiddenException();
+
+    if (!motivo) {
+      throw new BadRequestException('Motivo obrigatório');
+    }
+
+    await this.validarExistencia(id);
+
+    return this.prisma.escola.update({
+      where: { id },
+      data: {
+        ativa: false,
+        motivo_bloqueio: motivo,
+        bloqueada_em: new Date(),
+      },
+    });
+  }
+
+  // =============================
+  // 🔧 MANUTENÇÃO
+  // =============================
+  async manutencaoEscola(id: string, status: boolean, user: UsuarioLogado) {
+    if (user.role !== 'superadmin') throw new ForbiddenException();
+
+    await this.validarExistencia(id);
+
+    return this.prisma.escola.update({
+      where: { id },
+      data: {
+        modo_manutencao: status,
+      },
     });
   }
 }

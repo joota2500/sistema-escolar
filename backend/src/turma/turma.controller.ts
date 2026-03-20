@@ -8,94 +8,107 @@ import {
   Body,
   ParseUUIDPipe,
   BadRequestException,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 
 import { TurmaService } from './turma.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CriarTurmaDTO } from '../dto/criar-turma.dto';
+import { RequestComUsuario } from '../common/interfaces/request.interface';
 
+@UseGuards(JwtAuthGuard)
 @Controller('turma')
 export class TurmaController {
   constructor(private readonly turmaService: TurmaService) {}
 
-  // ==========================
-  // CRIAR
-  // ==========================
   @Post()
-  async criarTurma(@Body() dados: any) {
-    return this.turmaService.criarTurma(dados);
+  async criarTurma(
+    @Body() dados: CriarTurmaDTO,
+    @Req() req: RequestComUsuario,
+  ) {
+    return this.turmaService.criarTurma(dados, req.user);
   }
 
-  // ==========================
-  // LISTAR
-  // ==========================
   @Get()
-  async listarTurmas() {
-    return this.turmaService.listarTurmas();
+  async listarTurmas(@Req() req: RequestComUsuario) {
+    return this.turmaService.listarTurmas(req.user);
   }
 
-  // ==========================
-  // BUSCAR
-  // ==========================
   @Get(':id')
-  async buscarTurma(@Param('id', ParseUUIDPipe) id: string) {
-    return this.turmaService.buscarTurma(id);
+  async buscarTurma(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestComUsuario,
+  ) {
+    return this.turmaService.buscarTurma(id, req.user);
   }
 
-  // ==========================
-  // 🔥 PROFESSORES DA TURMA
-  // ==========================
   @Get(':id/professores')
-  async professores(@Param('id', ParseUUIDPipe) id: string) {
-    return this.turmaService.buscarProfessoresDaTurma(id);
+  async professores(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestComUsuario,
+  ) {
+    return this.turmaService.buscarProfessoresDaTurma(id, req.user);
   }
 
-  // ==========================
-  // ATUALIZAR
-  // ==========================
   @Put(':id')
   async atualizarTurma(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() dados: any,
+    @Body() dados: Partial<CriarTurmaDTO>,
+    @Req() req: RequestComUsuario,
   ) {
-    return this.turmaService.atualizarTurma(id, dados);
+    return this.turmaService.atualizarTurma(id, dados, req.user);
   }
 
-  // ==========================
-  // DELETAR
-  // ==========================
   @Delete(':id')
-  async deletarTurma(@Param('id', ParseUUIDPipe) id: string) {
-    return this.turmaService.deletarTurma(id);
+  async deletarTurma(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestComUsuario,
+  ) {
+    return this.turmaService.deletarTurma(id, req.user);
   }
 
-  // ==========================
-  // 🔗 VINCULAR PROFESSOR
-  // ==========================
   @Post('vincular-professor')
-  async vincularProfessor(@Body() body: any) {
+  async vincularProfessor(
+    @Body()
+    body: {
+      turma_id: string;
+      professor_id: string;
+      disciplina?: string;
+    },
+    @Req() req: RequestComUsuario,
+  ) {
     if (!body.turma_id || !body.professor_id) {
       throw new BadRequestException('Dados inválidos');
     }
 
-    return this.turmaService.vincularProfessor({
-      turma_id: body.turma_id,
-      professor_id: body.professor_id,
-      disciplina: body.disciplina,
-    });
+    return this.turmaService.vincularProfessor(body, req.user);
   }
 
-  // ==========================
-  // OBSERVAÇÃO
-  // ==========================
   @Post('observacao')
-  async criarObservacao(@Body() dados: any) {
+  async criarObservacao(
+    @Body()
+    dados: {
+      turma_id: string;
+      professor_id: string;
+      observacao: string;
+    },
+  ) {
     return this.turmaService.criarObservacao(dados);
   }
 
-  // ==========================
-  // HORÁRIO
-  // ==========================
   @Post('horario')
-  async criarHorario(@Body() dados: any) {
+  async criarHorario(
+    @Body()
+    dados: {
+      turma_id: string;
+      professor_id: string;
+      disciplina: string;
+      dia_semana: string;
+      hora_inicio: string;
+      hora_fim: string;
+    },
+  ) {
     return this.turmaService.criarHorario(dados);
   }
 }

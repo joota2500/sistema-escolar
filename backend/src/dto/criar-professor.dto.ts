@@ -5,4 +5,5 @@ export class CriarProfessorDTO {
   senha!: string;
   disciplina!: string;
   escola_id!: string;
+  telefone?: string;
 }

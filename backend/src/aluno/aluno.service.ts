@@ -1,29 +1,69 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
+
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateAlunoDTO } from '../dto/criar-aluno.dto';
+import { UsuarioLogado } from '../common/interfaces/usuario-logado.interface';
 
 @Injectable()
 export class AlunoService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async criar(data: {
-    nome: string;
-    cpf: string;
-    dataNascimento: string;
-    matricula: string;
-    turma_id: string;
-    nomePai?: string;
-    nomeMae?: string;
-    responsavel?: string;
-    telefoneResp?: string;
-    emailResp?: string;
-    endereco?: string;
-  }) {
-    return await this.prisma.aluno.create({
+  // ==========================
+  // 🔐 VALIDAÇÃO DE ACESSO
+  // ==========================
+  private validarAcesso(user: UsuarioLogado, escola_id: string) {
+    if (user.role === 'superadmin') return;
+
+    if (user.escola_id !== escola_id) {
+      throw new ForbiddenException('Acesso negado');
+    }
+  }
+
+  // ==========================
+  // 🔥 CRIAR ALUNO
+  // ==========================
+  async criar(data: CreateAlunoDTO, user: UsuarioLogado) {
+    if (!data.nome || !data.cpf || !data.dataNascimento || !data.turma_id) {
+      throw new BadRequestException('Dados obrigatórios faltando');
+    }
+
+    const turma = await this.prisma.turma.findUnique({
+      where: { id: data.turma_id },
+    });
+
+    if (!turma) {
+      throw new NotFoundException('Turma não encontrada');
+    }
+
+    this.validarAcesso(user, turma.escola_id);
+
+    const dataNascimento = new Date(data.dataNascimento);
+
+    if (isNaN(dataNascimento.getTime())) {
+      throw new BadRequestException('Data de nascimento inválida');
+    }
+
+    const matricula = `MAT-${data.cpf}`;
+
+    const cpfExistente = await this.prisma.aluno.findUnique({
+      where: { cpf: data.cpf },
+    });
+
+    if (cpfExistente) {
+      throw new BadRequestException('CPF já cadastrado');
+    }
+
+    return this.prisma.aluno.create({
       data: {
         nome: data.nome,
         cpf: data.cpf,
-        dataNascimento: new Date(data.dataNascimento),
-        matricula: data.matricula,
+        dataNascimento,
+        matricula,
         turma_id: data.turma_id,
 
         nomePai: data.nomePai ?? null,
@@ -36,20 +76,31 @@ export class AlunoService {
     });
   }
 
-  // 🔥 LISTAR ALUNOS
-  async listar() {
-    return await this.prisma.aluno.findMany({
-      include: {
-        turma: true,
+  // ==========================
+  // LISTAR
+  // ==========================
+  async listar(user: UsuarioLogado) {
+    if (user.role === 'superadmin') {
+      return this.prisma.aluno.findMany({
+        include: { turma: true },
+        orderBy: { nome: 'asc' },
+      });
+    }
+
+    return this.prisma.aluno.findMany({
+      where: {
+        turma: {
+          ...(user.escola_id && { escola_id: user.escola_id }),
+        },
       },
-      orderBy: {
-        nome: 'asc',
-      },
+      include: { turma: true },
+      orderBy: { nome: 'asc' },
     });
   }
-
-  // 🔥 BUSCAR POR ID
-  async buscar(id: string) {
+  // ==========================
+  // BUSCAR
+  // ==========================
+  async buscar(id: string, user: UsuarioLogado) {
     const aluno = await this.prisma.aluno.findUnique({
       where: { id },
       include: { turma: true },
@@ -59,21 +110,27 @@ export class AlunoService {
       throw new NotFoundException('Aluno não encontrado');
     }
 
+    this.validarAcesso(user, aluno.turma.escola_id);
+
     return aluno;
   }
 
-  // 🔥 DELETAR
-  async deletar(id: string) {
-    // verifica antes
+  // ==========================
+  // DELETAR
+  // ==========================
+  async deletar(id: string, user: UsuarioLogado) {
     const aluno = await this.prisma.aluno.findUnique({
       where: { id },
+      include: { turma: true },
     });
 
     if (!aluno) {
       throw new NotFoundException('Aluno não encontrado');
     }
 
-    return await this.prisma.aluno.delete({
+    this.validarAcesso(user, aluno.turma.escola_id);
+
+    return this.prisma.aluno.delete({
       where: { id },
     });
   }

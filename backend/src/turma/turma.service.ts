@@ -2,17 +2,34 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
+
 import { PrismaService } from '../prisma/prisma.service';
+import { CriarTurmaDTO } from '../dto/criar-turma.dto';
+import { UsuarioLogado } from '../common/interfaces/usuario-logado.interface';
 
 @Injectable()
 export class TurmaService {
   constructor(private prisma: PrismaService) {}
 
-  // ==========================
-  // CRIAR TURMA
-  // ==========================
-  async criarTurma(dados: any) {
+  private validarAcesso(user: UsuarioLogado, escola_id: string) {
+    if (user.role === 'superadmin') return;
+
+    if (user.escola_id !== escola_id) {
+      throw new ForbiddenException('Acesso negado');
+    }
+  }
+
+  async criarTurma(dados: CriarTurmaDTO, user: UsuarioLogado) {
+    if (!dados.nome || !dados.turno || !dados.ano_letivo) {
+      throw new BadRequestException('Dados obrigatórios faltando');
+    }
+
+    if (user.role !== 'superadmin') {
+      dados.escola_id = user.escola_id!;
+    }
+
     const escola = await this.prisma.escola.findUnique({
       where: { id: dados.escola_id },
     });
@@ -21,49 +38,58 @@ export class TurmaService {
       throw new NotFoundException('Escola não encontrada');
     }
 
-    const turmaExistente = await this.prisma.turma.findFirst({
+    const existe = await this.prisma.turma.findFirst({
       where: {
         nome: dados.nome,
+        identificador: dados.identificador,
         escola_id: dados.escola_id,
         ano_letivo: dados.ano_letivo,
       },
     });
 
-    if (turmaExistente) {
+    if (existe) {
       throw new BadRequestException('Turma já existe');
     }
 
     return this.prisma.turma.create({
-      data: dados,
-    });
-  }
-
-  // ==========================
-  // LISTAR
-  // ==========================
-  async listarTurmas() {
-    return this.prisma.turma.findMany({
-      include: {
-        escola: true,
+      data: {
+        nome: dados.nome,
+        serie: Number(dados.serie),
+        identificador: dados.identificador,
+        turno: dados.turno,
+        sala: dados.sala,
+        capacidade: Number(dados.capacidade),
+        ano_letivo: Number(dados.ano_letivo),
+        escola_id: dados.escola_id,
       },
     });
   }
 
-  // ==========================
-  // BUSCAR TURMA
-  // ==========================
-  async buscarTurma(id: string) {
+  async listarTurmas(user: UsuarioLogado) {
+    if (user.role === 'superadmin') {
+      return this.prisma.turma.findMany({
+        include: { escola: true },
+        orderBy: { nome: 'asc' },
+      });
+    }
+
+    return this.prisma.turma.findMany({
+      where: {
+        ...(user.escola_id && { escola_id: user.escola_id }),
+      },
+      include: { escola: true },
+      orderBy: { nome: 'asc' },
+    });
+  }
+
+  async buscarTurma(id: string, user: UsuarioLogado) {
     const turma = await this.prisma.turma.findUnique({
       where: { id },
       include: {
         professor_turma: {
-          include: {
-            professor: true, // 🔥 já traz professor junto
-          },
+          include: { professor: true },
         },
-        horarios: true,
-        observacoes_turma: true,
-        alunos: true, // 🔥 já prepara próximo passo
+        alunos: true,
       },
     });
 
@@ -71,58 +97,83 @@ export class TurmaService {
       throw new NotFoundException('Turma não encontrada');
     }
 
+    this.validarAcesso(user, turma.escola_id);
+
     return turma;
   }
 
-  // ==========================
-  // 🔗 PROFESSORES DA TURMA
-  // ==========================
-  async buscarProfessoresDaTurma(turmaId: string) {
+  async buscarProfessoresDaTurma(turmaId: string, user: UsuarioLogado) {
+    const turma = await this.prisma.turma.findUnique({
+      where: { id: turmaId },
+    });
+
+    if (!turma) {
+      throw new NotFoundException('Turma não encontrada');
+    }
+
+    this.validarAcesso(user, turma.escola_id);
+
     const data = await this.prisma.professorTurma.findMany({
-      where: {
-        turma_id: turmaId,
-      },
-      include: {
-        professor: true,
-      },
+      where: { turma_id: turmaId },
+      include: { professor: true },
     });
 
     return data.map((item) => item.professor);
   }
 
-  // ==========================
-  // ATUALIZAR
-  // ==========================
-  async atualizarTurma(id: string, dados: any) {
+  async atualizarTurma(
+    id: string,
+    dados: Partial<CriarTurmaDTO>,
+    user: UsuarioLogado,
+  ) {
+    const turma = await this.prisma.turma.findUnique({
+      where: { id },
+    });
+
+    if (!turma) {
+      throw new NotFoundException('Turma não encontrada');
+    }
+
+    this.validarAcesso(user, turma.escola_id);
+
     return this.prisma.turma.update({
       where: { id },
-      data: dados,
+      data: {
+        nome: dados.nome,
+        serie: dados.serie ? Number(dados.serie) : undefined,
+        identificador: dados.identificador,
+        turno: dados.turno,
+        sala: dados.sala,
+        capacidade: dados.capacidade ? Number(dados.capacidade) : undefined,
+        ano_letivo: dados.ano_letivo ? Number(dados.ano_letivo) : undefined,
+      },
     });
   }
 
-  // ==========================
-  // DELETAR
-  // ==========================
-  async deletarTurma(id: string) {
-    await this.prisma.turma.delete({
+  async deletarTurma(id: string, user: UsuarioLogado) {
+    const turma = await this.prisma.turma.findUnique({
       where: { id },
     });
+
+    if (!turma) {
+      throw new NotFoundException('Turma não encontrada');
+    }
+
+    this.validarAcesso(user, turma.escola_id);
+
+    await this.prisma.turma.delete({ where: { id } });
 
     return { mensagem: 'Turma deletada' };
   }
 
-  // ==========================
-  // 🔗 VINCULAR PROFESSOR
-  // ==========================
-  async vincularProfessor(dados: any) {
-    const professor = await this.prisma.professor.findUnique({
-      where: { id: dados.professor_id },
-    });
-
-    if (!professor) {
-      throw new NotFoundException('Professor não encontrado');
-    }
-
+  async vincularProfessor(
+    dados: {
+      turma_id: string;
+      professor_id: string;
+      disciplina?: string;
+    },
+    user: UsuarioLogado,
+  ) {
     const turma = await this.prisma.turma.findUnique({
       where: { id: dados.turma_id },
     });
@@ -130,6 +181,8 @@ export class TurmaService {
     if (!turma) {
       throw new NotFoundException('Turma não encontrada');
     }
+
+    this.validarAcesso(user, turma.escola_id);
 
     const existe = await this.prisma.professorTurma.findFirst({
       where: {
@@ -151,19 +204,22 @@ export class TurmaService {
     });
   }
 
-  // ==========================
-  // OBSERVAÇÃO
-  // ==========================
-  async criarObservacao(dados: any) {
-    return this.prisma.observacaoTurma.create({
-      data: dados,
-    });
+  async criarObservacao(dados: {
+    turma_id: string;
+    professor_id: string;
+    observacao: string;
+  }) {
+    return this.prisma.observacaoTurma.create({ data: dados });
   }
 
-  // ==========================
-  // HORÁRIO
-  // ==========================
-  async criarHorario(dados: any) {
+  async criarHorario(dados: {
+    turma_id: string;
+    professor_id: string;
+    disciplina: string;
+    dia_semana: string;
+    hora_inicio: string;
+    hora_fim: string;
+  }) {
     return this.prisma.horario.create({
       data: {
         ...dados,

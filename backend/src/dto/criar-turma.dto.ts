@@ -1,8 +1,8 @@
 export class CriarTurmaDTO {
   nome!: string;
   serie!: number;
-  identificador!: string;
-  turno!: string;
+  identificador!: string; // ex: "A", "B"
+  turno!: 'manha' | 'tarde' | 'noite';
   sala!: string;
   capacidade!: number;
   ano_letivo!: number;

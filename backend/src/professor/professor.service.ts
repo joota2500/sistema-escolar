@@ -2,26 +2,14 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from '../auth/auth.service';
-
-interface LoginDTO {
-  cpf: string;
-  senha: string;
-}
-
-interface ProfessorDTO {
-  nome: string;
-  cpf: string;
-  senha: string;
-  escola_id: string;
-  email?: string;
-  disciplina?: string;
-  telefone?: string;
-}
+import { CriarProfessorDTO } from '../dto/criar-professor.dto';
+import { UsuarioLogado } from '../common/interfaces/usuario-logado.interface';
 
 @Injectable()
 export class ProfessorService {
@@ -30,7 +18,6 @@ export class ProfessorService {
     private authService: AuthService,
   ) {}
 
-  // 🔥 FORMATADOR (SEM ERRO DE ESLINT)
   private formatarProfessor(prof: any) {
     return {
       id: prof.id,
@@ -44,40 +31,53 @@ export class ProfessorService {
     };
   }
 
-  async cadastrarProfessor(dados: ProfessorDTO) {
-    const { nome, cpf, senha, escola_id, email, disciplina, telefone } = dados;
+  private validarAcesso(user: UsuarioLogado, escola_id: string) {
+    if (user.role === 'superadmin') return;
 
-    if (!nome || !cpf || !senha || !escola_id) {
+    if (user.escola_id !== escola_id) {
+      throw new ForbiddenException('Acesso negado');
+    }
+  }
+
+  // ==========================
+  // CRIAR
+  // ==========================
+  async cadastrarProfessor(dados: CriarProfessorDTO, user: UsuarioLogado) {
+    if (!dados.nome || !dados.cpf || !dados.senha) {
       throw new BadRequestException('Dados obrigatórios faltando');
     }
 
-    const cpfExistente = await this.prisma.professor.findUnique({
-      where: { cpf },
-    });
-
-    if (cpfExistente) {
-      throw new BadRequestException('CPF já cadastrado');
+    if (user.role !== 'superadmin') {
+      dados.escola_id = user.escola_id!;
     }
 
     const escola = await this.prisma.escola.findUnique({
-      where: { id: escola_id },
+      where: { id: dados.escola_id },
     });
 
     if (!escola) {
       throw new NotFoundException('Escola não encontrada');
     }
 
-    const senhaHash = await bcrypt.hash(String(senha), 10);
+    const cpfExistente = await this.prisma.professor.findUnique({
+      where: { cpf: dados.cpf },
+    });
+
+    if (cpfExistente) {
+      throw new BadRequestException('CPF já cadastrado');
+    }
+
+    const senhaHash = await bcrypt.hash(dados.senha, 10);
 
     const professor = await this.prisma.professor.create({
       data: {
-        nome,
-        cpf,
-        email,
+        nome: dados.nome,
+        cpf: dados.cpf,
+        email: dados.email,
         senha: senhaHash,
-        disciplina,
-        telefone,
-        escola_id,
+        disciplina: dados.disciplina,
+        telefone: dados.telefone,
+        escola_id: dados.escola_id,
         status: 'ativo',
       },
     });
@@ -85,34 +85,29 @@ export class ProfessorService {
     return this.formatarProfessor(professor);
   }
 
-  async login(dados: LoginDTO) {
-    const { cpf, senha } = dados;
-
-    if (!cpf || !senha) {
-      throw new BadRequestException('CPF e senha obrigatórios');
-    }
-
+  // ==========================
+  // LOGIN (🔥 MELHORADO)
+  // ==========================
+  async login(dados: { cpf: string; senha: string }) {
     const professor = await this.prisma.professor.findUnique({
-      where: { cpf },
+      where: { cpf: dados.cpf },
     });
 
     if (!professor) {
-      throw new BadRequestException('CPF ou senha inválidos');
+      throw new BadRequestException('Credenciais inválidas');
     }
 
-    const senhaValida = await bcrypt.compare(
-      String(senha),
-      String(professor.senha),
-    );
+    const senhaValida = await bcrypt.compare(dados.senha, professor.senha);
 
     if (!senhaValida) {
-      throw new BadRequestException('CPF ou senha inválidos');
+      throw new BadRequestException('Credenciais inválidas');
     }
 
     const token = this.authService.gerarToken({
       id: professor.id,
       nome: professor.nome,
       role: 'professor',
+      escola_id: professor.escola_id, // 🔥 ESSENCIAL
     });
 
     return {
@@ -125,57 +120,120 @@ export class ProfessorService {
     };
   }
 
-  async listarProfessores() {
+  // ==========================
+  // LISTAR
+  // ==========================
+  async listarProfessores(user: UsuarioLogado) {
+    if (user.role === 'superadmin') {
+      const professores = await this.prisma.professor.findMany({
+        orderBy: { nome: 'asc' },
+      });
+
+      return professores.map((p) => this.formatarProfessor(p));
+    }
+
     const professores = await this.prisma.professor.findMany({
-      include: { escola: true },
+      where: {
+        ...(user.escola_id && { escola_id: user.escola_id }),
+      },
       orderBy: { nome: 'asc' },
     });
 
-    return professores.map((prof) => this.formatarProfessor(prof));
+    return professores.map((p) => this.formatarProfessor(p));
   }
 
-  async buscarProfessor(id: string) {
+  // ==========================
+  // BUSCAR
+  // ==========================
+  async buscarProfessor(id: string, user: UsuarioLogado) {
     const professor = await this.prisma.professor.findUnique({
       where: { id },
-      include: { escola: true },
     });
 
     if (!professor) {
       throw new NotFoundException('Professor não encontrado');
     }
 
+    this.validarAcesso(user, professor.escola_id);
+
     return this.formatarProfessor(professor);
   }
 
+  // ==========================
+  // ATUALIZAR
+  // ==========================
+  async atualizarProfessor(
+    id: string,
+    dados: Partial<CriarProfessorDTO>,
+    user: UsuarioLogado,
+  ) {
+    const professor = await this.prisma.professor.findUnique({
+      where: { id },
+    });
+
+    if (!professor) {
+      throw new NotFoundException('Professor não encontrado');
+    }
+
+    this.validarAcesso(user, professor.escola_id);
+
+    const atualizado = await this.prisma.professor.update({
+      where: { id },
+      data: {
+        nome: dados.nome,
+        email: dados.email,
+        disciplina: dados.disciplina,
+        telefone: dados.telefone,
+      },
+    });
+
+    return this.formatarProfessor(atualizado);
+  }
+
+  // ==========================
+  // DELETAR
+  // ==========================
+  async deletarProfessor(id: string, user: UsuarioLogado) {
+    const professor = await this.prisma.professor.findUnique({
+      where: { id },
+    });
+
+    if (!professor) {
+      throw new NotFoundException('Professor não encontrado');
+    }
+
+    this.validarAcesso(user, professor.escola_id);
+
+    await this.prisma.professor.delete({
+      where: { id },
+    });
+
+    return { mensagem: 'Professor deletado com sucesso' };
+  }
+
+  // ==========================
+  // SENHA
+  // ==========================
   async alterarSenha(dados: {
     cpf: string;
     senhaAtual: string;
     novaSenha: string;
   }) {
-    const { cpf, senhaAtual, novaSenha } = dados;
-
-    if (!cpf || !senhaAtual || !novaSenha) {
-      throw new BadRequestException('Dados incompletos');
-    }
-
     const professor = await this.prisma.professor.findUnique({
-      where: { cpf },
+      where: { cpf: dados.cpf },
     });
 
     if (!professor) {
       throw new NotFoundException('Professor não encontrado');
     }
 
-    const senhaValida = await bcrypt.compare(
-      String(senhaAtual),
-      String(professor.senha),
-    );
+    const senhaValida = await bcrypt.compare(dados.senhaAtual, professor.senha);
 
     if (!senhaValida) {
       throw new BadRequestException('Senha atual inválida');
     }
 
-    const novaSenhaHash = await bcrypt.hash(String(novaSenha), 10);
+    const novaSenhaHash = await bcrypt.hash(dados.novaSenha, 10);
 
     await this.prisma.professor.update({
       where: { id: professor.id },
@@ -183,41 +241,5 @@ export class ProfessorService {
     });
 
     return { mensagem: 'Senha atualizada com sucesso' };
-  }
-
-  async atualizarProfessor(id: string, dados: Partial<ProfessorDTO>) {
-    const professor = await this.prisma.professor.findUnique({
-      where: { id },
-    });
-
-    if (!professor) {
-      throw new NotFoundException('Professor não encontrado');
-    }
-
-    const atualizado = await this.prisma.professor.update({
-      where: { id },
-      data: {
-        ...dados,
-        senha: undefined,
-      },
-    });
-
-    return this.formatarProfessor(atualizado);
-  }
-
-  async deletarProfessor(id: string) {
-    const professor = await this.prisma.professor.findUnique({
-      where: { id },
-    });
-
-    if (!professor) {
-      throw new NotFoundException('Professor não encontrado');
-    }
-
-    await this.prisma.professor.delete({
-      where: { id },
-    });
-
-    return { mensagem: 'Professor deletado com sucesso' };
   }
 }
